@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}
+  {% if action_type == 'update' %}
+    Редактирование публикации
+  {% elif action_type == 'delete' %}
+    Удаление публикации
+  {% else %}
+    Добавление публикации
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="col d-flex justify-content-center">
+    <div class="card" style="width: 40rem;">
+      <div class="card-header">
+        {% if action_type == 'update' %}
+          Редактирование публикации
+        {% elif action_type == 'delete' %}
+          Удаление публикации
+        {% else %}
+          Добавление публикации
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if action_type != 'delete' %}
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">Отправить</button>
+          </form>
+        {% else %}
+          {% if object.image %}
+            <a href="{{ object.image.url }}" target="_blank">
+              <img class="border-3 rounded img-fluid img-thumbnail mb-2" src="{{ object.image.url }}">
+            </a>
+          {% endif %}
+          <article>
+            <p><strong>Дата:</strong> {{ object.pub_date|date:"d E Y H:i" }}</p>
+            <p>
+              <strong>Категория:</strong>
+              {% if object.category %}{{ object.category.title }}{% else %}Без категории{% endif %}
+              |
+              <strong>Локация:</strong>
+              {% if object.location %}{{ object.location.name }}{% else %}Планета Земля{% endif %}
+            </p>
+            <h3>{{ object.title }}</h3>
+            <p>{{ object.text|linebreaksbr }}</p>
+          </article>
+          <form method="post">
+            {% csrf_token %}
+            <p>Вы уверены, что хотите удалить эту публикацию?</p>
+            {% bootstrap_button button_type="submit" content="Да, удалить" button_class="btn-danger" %}
+            <a href="{% url 'users:profile' username=request.user.username %}" class="btn btn-secondary">Отмена</a>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %} 

@@ -104,12 +104,21 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Secrets and local configuration
+*.pem
+*.key
+secrets.json
+secrets.yaml
+secrets.yml
 
 # Spyder project settings
 .spyderproject
@@ -125,6 +134,11 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Hugging Face model cache
+.cache/huggingface/
+.huggingface/
+huggingface/
 
 # Pyre type checker
 .pyre/
