@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models import Count
-from django.utils import timezone
 
 MAX_LENGTH_FIELDS = 256
 
@@ -65,26 +63,6 @@ class Location(BaseModel):
         return self.name
 
 
-class PostQuerySet(models.QuerySet):
-    """Набор запросов с общими правилами выборки публикаций."""
-
-    def published(self):
-        """Оставить публикации, доступные всем посетителям."""
-        return self.filter(
-            is_published=True,
-            category__is_published=True,
-            pub_date__lte=timezone.now(),
-        )
-
-    def for_list(self):
-        """Добавить связанные данные и количество комментариев."""
-        return self.select_related(
-            'author', 'category', 'location'
-        ).annotate(
-            comment_count=Count('comments')
-        ).order_by('-pub_date')
-
-
 class Post(BaseModel):
     """Публикация пользователя с категорией и местоположением."""
 
@@ -119,7 +97,6 @@ class Post(BaseModel):
         verbose_name='Категория',
     )
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
-    objects = PostQuerySet.as_manager()
 
     class Meta:
         default_related_name = 'posts'
@@ -138,12 +115,10 @@ class Comment(models.Model):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name='comments',
     )
     author = models.ForeignKey(
         'auth.User',
         on_delete=models.CASCADE,
-        related_name='comments',
     )
     text = models.TextField(verbose_name='Текст')
     created_at = models.DateTimeField(
@@ -152,7 +127,10 @@ class Comment(models.Model):
     )
 
     class Meta:
+        default_related_name = 'comments'
         ordering = ('created_at',)
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         """Вернуть сокращённый текст комментария."""

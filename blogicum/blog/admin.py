@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Location, Post
+from .models import Category, Comment, Location, Post
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -21,6 +21,15 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'created_at', 'is_published')
 
 
+class CommentAdmin(admin.ModelAdmin):
+    """Настройки отображения комментариев в панели администратора."""
+
+    list_display = ('post', 'author', 'text', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('text', 'author__username', 'post__title')
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Post, PostAdmin)
+admin.site.register(Comment, CommentAdmin)
