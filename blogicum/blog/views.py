@@ -30,9 +30,9 @@ def get_posts_queryset(apply_filters=False, annotate_comments=False):
     return queryset
 
 
-def paginate_queryset(request, queryset):
+def paginate_queryset(request, queryset, per_page=POSTS_PER_PAGE):
     """Вернуть запрошенную страницу переданного набора объектов."""
-    paginator = Paginator(queryset, POSTS_PER_PAGE)
+    paginator = Paginator(queryset, per_page)
     return paginator.get_page(request.GET.get('page'))
 
 
@@ -50,7 +50,6 @@ def post_detail(request, post_id):
     post = get_object_or_404(get_posts_queryset(), pk=post_id)
     if post.author != request.user and (
         not post.is_published
-        or post.category is None
         or not post.category.is_published
         or post.pub_date > timezone.now()
     ):
@@ -156,7 +155,6 @@ def add_comment(request, post_id):
         comment.author = request.user
         comment.post = post
         comment.save()
-        return redirect('blog:post_detail', post_id=post_id)
     return render(request, 'blog/detail.html', {
         'post': post,
         'comments': post.comments.select_related('author'),
