@@ -155,6 +155,7 @@ def add_comment(request, post_id):
         comment.author = request.user
         comment.post = post
         comment.save()
+        return redirect('blog:post_detail', post_id=post_id)
     return render(request, 'blog/detail.html', {
         'post': post,
         'comments': post.comments.select_related('author'),
